@@ -1,6 +1,8 @@
 import { Router } from "express";
+const stripe = require('stripe')('sk_test_51Hoje2CohLCE8kRQLxcqg0MmJb5ndvoyj55CWlPYBu98FO2WpoU00PwnmXHHHjLNf3QNYmO4JQv3rz2Was9BfmtK0030uQmrJ4');
 
 import Order from "../models/order";
+import Product from "../models/product";
 import OrderItem from "../models/order-item";
 
 const router = Router();
@@ -185,5 +187,41 @@ router.get('/get/userorder/:id',  async(req, res)=>{
     }
     res.send({orderItem});
 })
+
+router.post('/create-checkout-session', async (req, res) => {
+    const {orderItems} = req.body;
+
+    if(!orderItems){
+        res.status(400).send('No order items');
+        return;
+    }
+
+    const product = await Promise.all(orderItems.map(async(item: any) =>{
+        const result = await Product.findById(item.id);
+         if(!result){
+            return;
+         }
+
+        return{
+            price_data: {
+                currency: 'usd',
+                product_data: {
+                name: result?.name,
+                },
+                unit_amount: result?.price * 100,
+            },
+            quantity: item.quantity,
+        }
+    }))
+
+    const session = await stripe.checkout.sessions.create({
+      line_items: product,
+      mode: 'payment',
+      success_url: `http://localhost:4200/payment/success`,
+      cancel_url: `http://localhost:4200/payment/failed`,
+    });
+  
+    res.json({id: session.id});
+  });
 
 export default router;
