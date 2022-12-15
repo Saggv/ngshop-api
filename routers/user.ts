@@ -2,13 +2,22 @@ import { Router, Request, Response } from 'express';
 import bcryptjs from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
+import { ROLES, verifyRoles } from '../helpers/verifyRoles';
 
 import User from '../models/user';
 
 const router = Router();
 
-router.get('/', async(req, res) =>{
-    const listUser = await User.find().sort({createdAt: -1});
+router.get('/', verifyRoles([ROLES.Admin, ROLES.Manager]), async(req: any, res) =>{
+    let filter = {};
+
+    if (req.auth.role === ROLES.Manager) {
+      filter = {
+        role: [ROLES.Manager, ROLES.User],
+      };
+    }
+
+    const listUser = await User.find(filter).sort({createdAt: -1});
     if(!listUser){
        return res.status(400).send('Can not list the users1'); 
     }
@@ -36,7 +45,7 @@ router.post('/login', async(req, res) =>{
         const secretKey: string = process.env.SECRET_KEY || 'asdfasdfs';
         const token = jwt.sign({
             id: user.id,
-            isAdmin: user.isAdmin
+            role: user.role
         }, 
         secretKey,
         {expiresIn: '1d'});
@@ -63,7 +72,8 @@ router.post('/register',  async(req: Request , res: Response) =>{
         city,
         zip,
         country,
-        isAdmin
+        isAdmin,
+        role,
     } = req.body; 
 
     const user = await new User({
@@ -76,6 +86,7 @@ router.post('/register',  async(req: Request , res: Response) =>{
         zip,
         country,
         isAdmin,
+        role,
         password: bcryptjs.hashSync(password, 10)
     }).save();
 
@@ -150,7 +161,5 @@ router.get('/get/count', async(req, res) =>{
 
     res.send({count});
 });
-
-
 
 export default router;

@@ -7,7 +7,7 @@ function authJwt(){
     return expressjwt({
         secret,
         algorithms: ["HS256"],
-        isRevoked: isRevokedCallback 
+        // isRevoked: isRevokedCallback 
     }).unless({
         path: [
             // {
@@ -19,12 +19,13 @@ function authJwt(){
             // {
             //     url: /\/category(.*)/, methods: ['GET', 'OPTIONS']
             // },
-            // '/user/login',
-            // '/user/register'
+            '/user/login',
+            '/user/register',
+            '/products'
 
-            {
-                url: /(.*)/
-            },
+            // {
+            //     url: /(.*)/
+            // },
         ]
     });
 };

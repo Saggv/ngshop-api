@@ -40,7 +40,8 @@ const uploadOption = multer({ storage: storage })
 
 const router = Router();
 
-router.get("/", (req: Request, res: Response) => {
+router.get("/", (req: any, res: Response) => {
+  console.log('dd')
   let filter = {};
 
   if (req.query.categories) {

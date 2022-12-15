@@ -58,7 +58,11 @@ const userSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now()
-    }
+    },
+    role: {
+        type: String,
+        required: true
+    },
 });
 
 export default mongoose.model('User', userSchema);
