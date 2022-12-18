@@ -9,7 +9,7 @@ import categoryRouter from './routers/categories';
 import userRouter from './routers/user';
 import orderRouter from './routers/order';
 
-import authJwt from './helpers/jwt';
+import {authJwt} from './helpers/jwt';
 import errorHandler from './helpers/err-handler';
 
 
@@ -32,7 +32,7 @@ app.use('/category', categoryRouter);
 app.use('/user', userRouter);
 app.use('/order', orderRouter);
 
-mongoose.connect(mongooseUri).then(() => {
+mongoose.connect('mongodb://localhost:27017/shop').then(() => {
     console.log('Connect to mongoose successfully!')
 }).catch(err =>{
     console.log('Conntect to mongoose error!', err);

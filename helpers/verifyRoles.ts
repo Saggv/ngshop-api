@@ -6,9 +6,9 @@ export enum ROLES {
 
 export const verifyRoles = (allowedRoles: string[]) => {
   return (req: any, res: any, next: any) => {
-    if (!req?.auth.role) return res.sendStatus(401);
+    if (!req?.auth.role) return res.status(401).send({message: 'Unauthorized'});
     const result = allowedRoles.includes(req.auth.role);
-    if (!result) return res.sendStatus(401);
+    if (!result) return res.status(401).send({message: 'Unauthorized'});
     next();
   }
 }
